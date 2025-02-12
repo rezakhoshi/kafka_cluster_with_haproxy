@@ -3,14 +3,12 @@ kafka1_server
 kafka2_server
 kafka3_server
 -----------------firewall----------
-for user this kafka from APP1 (on sever_app) must:
+for use this kafka_cluster from APP1 (on sever_app) must:
 open port 29092 to VIP
 open port 9092 to kafkaX_server_ip
 ------------------------------------zookeeper-for-per-server-------------------------------
 wget https://downloads.apache.org/zookeeper/stable/apache-zookeeper-3.8.4-bin.tar.gz
 tar -xzf  apache-zookeeper-3.8.4-bin.tar.gz    -->mv  to /opt/zookeeper/  directory
-
-
 
 nano /opt/zookeeper/conf/zoo.cfg
 dataDir=/var/lib/zookeeper
@@ -53,7 +51,6 @@ systemctl status  zookeeper
 ------------------------------------kafka-for-per-server-------------------------------
 wget https://downloads.apache.org/kafka/3.9.0/kafka_2.12-3.9.0.tgz
 tar -xzf kafka_2.12-3.9.0.tgz           -->mv to /opt/kafka/  directory
-
 
 nano /opt/kafka/config/server.properties
 
@@ -166,7 +163,7 @@ frontend kafka_ui_front
     bind *:29090   #-->(use deferent of kafka-ui port)
     mode tcp
     option tcplog
-    default_backend kafka_ui_back  # Fixed name to match the backend
+    default_backend kafka_ui_back
 
 backend kafka_back
     mode tcp
@@ -187,7 +184,7 @@ backend kafka_ui_back
     server kafka3 kafka3_server_ip:9090 check
 
 systemctl restart haproxy
-------------------------------------
+------------------------------------useful-commands-------------------
 on /opt/zookeeper/conf/bin
 
 ./zkServer.sh status
@@ -200,5 +197,5 @@ get /controller
 
 on /opt/kafka/bin
 
-./kafka-topics.sh --create   --bootstrap-server 192.168.158.229:29092   --replication-factor 3   --partitions 3   --topic health-check-topic-haprxy
+./kafka-topics.sh --create   --bootstrap-server 192.168.1.4:29092   --replication-factor 3   --partitions 3   --topic health-check-topic-haprxy
 
