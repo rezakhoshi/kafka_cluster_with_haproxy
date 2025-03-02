@@ -1,0 +1,47 @@
+sudo apt update -y
+sudo apt install -y python3-pip sshpass git curl
+-----------------------------
+ssh-keygen -t rsa -b 4096
+ssh-copy-id user@node-ip
+-----------------------------
+git clone https://github.com/kubernetes-sigs/kubespray.git
+cd kubespray
+git checkout release-2.23  # Choose the latest stable release
+-----------------------------
+pip install -r requirements.txt
+-----------------------------
+cp -rfp inventory/sample inventory/mycluster
+-----------------------------
+Edit inventory/mycluster/inventory.ini and add your node IPs:
+
+[all]
+master1 ansible_host=192.168.152.42
+master2 ansible_host=192.168.152.130
+worker1 ansible_host=192.168.152.50
+worker2 ansible_host=192.168.152.51
+
+[kube_control_plane]
+master1
+master2
+
+[kube_node]
+worker1
+worker2
+
+[etcd]
+master1
+master2
+
+[k8s_cluster:children]
+kube_control_plane
+kube_node
+-----------------------------
+Modify inventory/mycluster/group_vars/k8s_cluster/k8s-cluster.yml as needed, for example:
+
+kube_network_plugin: calico
+-----------------------------
+ansible-playbook -i inventory/mycluster/inventory.ini --become --become-user=root cluster.yml
+-----------------------------
+export KUBECONFIG=~/.kube/config
+kubectl get nodes
+
